@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.33530.505
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Star Rail FPS UNLOCKER", "Star Rail FPS UNLOCKER.vcxproj", "{2E91320B-4D3A-4913-9307-25271E3B1A66}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2E91320B-4D3A-4913-9307-25271E3B1A66}.Debug|x64.ActiveCfg = Debug|x64
+		{2E91320B-4D3A-4913-9307-25271E3B1A66}.Debug|x64.Build.0 = Debug|x64
+		{2E91320B-4D3A-4913-9307-25271E3B1A66}.Debug|x86.ActiveCfg = Debug|Win32
+		{2E91320B-4D3A-4913-9307-25271E3B1A66}.Debug|x86.Build.0 = Debug|Win32
+		{2E91320B-4D3A-4913-9307-25271E3B1A66}.Release|x64.ActiveCfg = Release|x64
+		{2E91320B-4D3A-4913-9307-25271E3B1A66}.Release|x64.Build.0 = Release|x64
+		{2E91320B-4D3A-4913-9307-25271E3B1A66}.Release|x86.ActiveCfg = Release|Win32
+		{2E91320B-4D3A-4913-9307-25271E3B1A66}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {7F8753C9-B5BF-4577-8B4C-9BC651657536}
+	EndGlobalSection
+EndGlobal
