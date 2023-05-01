@@ -79,7 +79,11 @@ bool IsProcessRunning(const wchar_t* processName) {
     CloseHandle(snapshot);
     return exists;
 }
-
+void set_speed_global(float speed) {
+    uintptr_t unity_player = GetModuleBaseAddress(GetProcId(L"UnityPlayer.dll"), L"UnityPlayer.dll");
+    uintptr_t address = Read<uintptr_t>(unity_player + 0x1D21D78) + 0xFC;
+    Write<float>(address, speed);
+}
 
 
 #endif

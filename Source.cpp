@@ -8,7 +8,7 @@
 #include <chrono>
 
 
-
+/*
 void InputThread(int& fps) {
     while (true) {
         std::cout << "fps now is " << fps << ". Enter a new value or leave it blank to keep the current value: ";
@@ -23,6 +23,103 @@ void InputThread(int& fps) {
                 std::cerr << "Error: " << e.what() << std::endl;
             }
         }
+    }
+}
+*/
+void MainRoutine() {
+    system("cls");
+    std::cout << "Made with love by ELJoOker#8401\n\n\n";
+    Sleep(2000);
+    DWORD procId = GetProcId(L"StarRail.exe");
+
+    int fps = 144;
+    const int hotkey = 0x52;
+    if (procId) {
+        hProcess = OpenProcess(PROCESS_ALL_ACCESS, NULL, procId);
+        std::cout << "Successfully attached to the process." << "\n\n\n"<< std::endl;
+
+        // Perform operations on the attached process here
+        Sleep(10000);
+        uintptr_t fpsAddress = GetModuleBaseAddress(procId, L"unityplayer.dll") + 0x1C4E000;  //unityplayer.dll+1C4E000
+        Write<int>(LPVOID(fpsAddress), fps);
+        
+        std::cout << "functions:" << std::endl;
+        std::cout << "hold R key to spam space" << std::endl;
+        std::cout << "press Insert to toggle dialoge skip" << std::endl;
+        std::cout << "press Home to change fps value (default is 144)"; std::cout << " current fps is " << fps  << std::endl;
+        std::cout << "press END to toggle game speed" << std::endl;
+        std::cout << "press f1 to enable peeking" << std::endl;
+        bool spaceSpam = false;
+        bool gamespeedBool=false;
+        float gamespeed = 2.0f;
+        bool peeking = false;
+        
+        while (true) {
+            
+            if (GetAsyncKeyState(VK_F12) & 0x8000) {
+                peeking = !peeking;
+                std::cout << "peeking is " << (peeking ? "on" : "off") <<  std::endl;
+                Sleep(500);
+            }
+            if (peeking) {
+                uintptr_t peekingAdress = GetModuleBaseAddress(procId, L"gameassembly.dll") + 0x51292C0;
+                Write<BYTE>(LPVOID(peekingAdress), 0xC3);
+               
+           }
+            else {
+                uintptr_t peekingAdress = GetModuleBaseAddress(procId, L"gameassembly.dll") + 0x51292C0;
+                Write<BYTE>(LPVOID(peekingAdress), 0x40);
+                
+            }
+
+            if (GetAsyncKeyState(VK_END) & 0x8000) {
+                gamespeedBool = !gamespeedBool;
+                std::cout << "game speed " << (gamespeedBool ? "on" : "off") << " hold \"LSHIFT\" to use" << std::endl;
+                Sleep(500);
+            }
+            if (gamespeedBool && GetAsyncKeyState(VK_LSHIFT) & 0x8000) {
+                
+            }
+            else {
+                uintptr_t gameSpeedAddress = GetModuleBaseAddress(procId, L"unityplayer.dll" ) + 0x1D21D78;  
+                Write<float>(LPVOID(gameSpeedAddress + 0xFC), 1.0f);
+            }
+
+            if (GetAsyncKeyState(VK_HOME) & 0x8000) {
+                std::cout << "enter fps:";
+                std::cin >> fps;
+
+            }
+
+            int value1 = Read<int>(LPVOID(fpsAddress));
+            if (value1 != fps) {
+                
+                Write<int>(LPVOID(fpsAddress), fps);
+            }
+
+
+            if (GetAsyncKeyState(VK_INSERT) & 0x8000) {
+                spaceSpam = !spaceSpam;
+                std::cout << " dialoge skip is " << (spaceSpam ? "on" : "off") << " hold \"R\" to use" << std::endl;
+                Sleep(500);
+            }
+            // Check if the hotkey is pressed
+            if (spaceSpam && GetAsyncKeyState(hotkey) & 0x8000)
+            {
+                // Simulate a left mouse button click
+                keybd_event(VK_SPACE, 0, 0, 0); // Press the "Space" key
+                keybd_event(VK_SPACE, 0, KEYEVENTF_KEYUP, 0); // Release the "Space" key
+
+            }
+
+            DWORD procId = GetProcId(L"StarRail.exe");
+            if (procId == 0) {
+                std::cout << "Star Rail has been closed" << std::endl;
+                exit(0);
+            }
+           
+        }
+
     }
 }
 int main(){
@@ -45,20 +142,21 @@ int main(){
         system("kdu.exe -map Driver.sys");
         system("cls");
         std::cout << "successfully excuted all commands\n";
+        Sleep(500);
         HMODULE LoadliBriray = LoadLibraryA("DLL.dll");
         if (LoadliBriray)
         {
             std::cout << "successfully injected dll\n";
+            Sleep(500);
         }
         else
         {
             std::cout << "failed injecting dll\n";
         }
-
-        std::cout << "Made with love by ELJoOker#8401\n\n\n";
-        Sleep(2000);
-        const wchar_t* processName = L"StarRail.exe";
+        Sleep(3000);
+       
         std::cout << "Waiting for process to start...\n";
+        const wchar_t* processName = L"StarRail.exe";
         // Wait for the process to start
         if (!IsProcessRunning(processName)) {
             std::string files[] = { "dll_injector64.exe", "star_rail.dll" };
@@ -75,6 +173,7 @@ int main(){
                 // all files exist, execute the command
                 system("dll_injector64.exe /dll star_rail.dll /target StarRail.exe");
                 std::cout << "successfully excuted all commands\n";
+                Sleep(500);
             }
             else {
                 std::cout << "unknown error\n";
@@ -118,94 +217,14 @@ int main(){
 
             }
             */
-            DWORD procId = GetProcId(L"StarRail.exe");
-
-            int fps = 144;
-            const int hotkey = 0x52;
-            if (procId) {
-                hProcess = OpenProcess(PROCESS_ALL_ACCESS, NULL, procId);
-                std::cout << "Successfully attached to the process." << std::endl;
-
-                // Perform operations on the attached process here
-                Sleep(10000);
-                uintptr_t address = GetModuleBaseAddress(procId, L"unityplayer.dll") + 0x1C4E000;  //unityplayer.dll+1C4E000
-                Write<int>(LPVOID(address), fps);
-                std::cout << "Successfully wrote value to memory.\ncurrent fps is " << fps << std::endl;
-                std::cout << "hold R key to spam space" << std::endl;
-                // std::cout << "exiting in 3 seconds\n";
-                // Sleep(3000);
-                std::thread inputThread(InputThread, std::ref(fps));
-                inputThread.detach();
-                while (true) {
-                    int value1 = Read<int>(LPVOID(address));
-                    if (value1 != fps) {
-                        Write<int>(LPVOID(address), fps);
-                    }
-
-                    // Check if the hotkey is pressed
-                    if (GetAsyncKeyState(hotkey) & 0x8000)
-                    {
-                        // Simulate a left mouse button click
-                        keybd_event(VK_SPACE, 0, 0, 0); // Press the "Space" key
-                        keybd_event(VK_SPACE, 0, KEYEVENTF_KEYUP, 0); // Release the "Space" key
-
-                    }
-                    DWORD procId = GetProcId(L"StarRail.exe");
-                    if (procId == 0) {
-                        std::cout << "Star Rail has been closed" << std::endl;
-                        exit(0);
-                    }
-                    std::this_thread::sleep_for(std::chrono::milliseconds(100));
-                }
-
-            }
+            MainRoutine();
 
         }
         else
         {
             std::cout << "proccess already running , can't inject bypass" << std::endl;
             std::cout << "normal functions will work anyway" << std::endl;
-            DWORD procId = GetProcId(L"StarRail.exe");
-
-            int fps = 144;
-            const int hotkey = 0x52;
-            if (procId) {
-                hProcess = OpenProcess(PROCESS_ALL_ACCESS, NULL, procId);
-                std::cout << "Successfully attached to the process." << std::endl;
-
-                // Perform operations on the attached process here
-                Sleep(10000);
-                uintptr_t address = GetModuleBaseAddress(procId, L"unityplayer.dll") + 0x1C4E000;  //unityplayer.dll+1C4E000
-                Write<int>(LPVOID(address), fps);
-                std::cout << "Successfully wrote value to memory.\ncurrent fps is " << fps << std::endl;
-                std::cout << "hold R key to spam space" << std::endl;
-                // std::cout << "exiting in 3 seconds\n";
-                // Sleep(3000);
-                std::thread inputThread(InputThread, std::ref(fps));
-                inputThread.detach();
-                while (true) {
-                    int value1 = Read<int>(LPVOID(address));
-                    if (value1 != fps) {
-                        Write<int>(LPVOID(address), fps);
-                    }
-
-                    // Check if the hotkey is pressed
-                    if (GetAsyncKeyState(hotkey) & 0x8000)
-                    {
-                        // Simulate a left mouse button click
-                        keybd_event(VK_SPACE, 0, 0, 0); // Press the "Space" key
-                        keybd_event(VK_SPACE, 0, KEYEVENTF_KEYUP, 0); // Release the "Space" key
-
-                    }
-                    DWORD procId = GetProcId(L"StarRail.exe");
-                    if (procId == 0) {
-                        std::cout << "Star Rail has been closed" << std::endl;
-                        exit(0);
-                    }
-                    std::this_thread::sleep_for(std::chrono::milliseconds(100));
-                }
-
-            }
+            MainRoutine();
 
         }
         
