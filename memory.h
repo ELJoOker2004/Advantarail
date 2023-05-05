@@ -79,11 +79,17 @@ bool IsProcessRunning(const wchar_t* processName) {
     CloseHandle(snapshot);
     return exists;
 }
-void set_speed_global(float speed) {
-    uintptr_t unity_player = GetModuleBaseAddress(GetProcId(L"UnityPlayer.dll"), L"UnityPlayer.dll");
-    uintptr_t address = Read<uintptr_t>(unity_player + 0x1D21D78) + 0xFC;
-    Write<float>(address, speed);
+template <typename T>
+void write(uintptr_t address, T value) {
+    DWORD oldProtection;
+    VirtualProtect(reinterpret_cast<void**>(address), sizeof(T), PAGE_EXECUTE_READWRITE, &oldProtection);
+    *reinterpret_cast<T*>(address) = value;
+    VirtualProtect(reinterpret_cast<void**>(address), sizeof(T), oldProtection, &oldProtection);
 }
 
+template <typename K>
+K read(uintptr_t address) {
+    return *reinterpret_cast<K*>(address);
+}
 
 #endif
