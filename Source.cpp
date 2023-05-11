@@ -26,6 +26,28 @@ void InputThread(int& fps) {
     }
 }
 */
+
+void dllInjection() {
+    std::string files[] = { "dll_injector64.exe", "star_rail.dll" };
+    bool bypass_files_exist = true;
+
+    for (const auto& file_name : files) {
+        std::ifstream file(file_name);
+        if (!file.good()) {
+            bypass_files_exist = false;
+            std::cerr << "Error: '" << file_name << "' not found" << std::endl;
+        }
+    }
+    if (bypass_files_exist) {
+        // all files exist, execute the command
+        system("dll_injector64.exe /dll star_rail.dll /target StarRail.exe");
+        std::cout << "successfully excuted all commands\n";
+        Sleep(500);
+    }
+    else {
+        std::cout << "unknown error\n";
+    }
+}
 void MainRoutine() {
     system("cls");
     Sleep(1000);
@@ -54,9 +76,10 @@ void MainRoutine() {
         std::cout << "press Insert to toggle dialoge skip" << std::endl;
         std::cout << "press Home to change fps value (default is 144)"; std::cout << " current fps is " << fps  << std::endl;
         std::cout << "press END to toggle game speed" << std::endl;
-        std::cout << "press f12 to enable peeking" << std::endl;
+        std::cout << "press f9 to enable peeking" << std::endl;
         std::cout << "press f10 to change custom profile" << std::endl;
         std::cout << "press f2 while in battle to unlock battle speedup" << std::endl;
+        std::cout << "press f12 for fast close game" << std::endl;
         bool spaceSpam = false;
         bool gamespeedBool=false;
         float gamespeed = 2.0f;
@@ -75,8 +98,18 @@ void MainRoutine() {
                 std::cin >> fps;
 
             }
-            //peeking function --start
             if (GetAsyncKeyState(VK_F12) & 0x8000) {
+                if (TerminateProcessByName(L"StarRail.exe")) {
+                    std::cout << "StarRail.exe terminated successfully\n";
+                }
+                else {
+                    std::cerr << "Could not terminate StarRail.exe\n";
+                }
+                Sleep(500);
+                
+            }
+            //peeking function --start
+            if (GetAsyncKeyState(VK_F9) & 0x8000) {
                 peeking = !peeking;
                 std::cout << "peeking is " << (peeking ? "on" : "off") <<  std::endl;
                 Sleep(500);
@@ -193,11 +226,11 @@ void MainRoutine() {
 
             if (GetAsyncKeyState(VK_INSERT) & 0x8000) {
                 spaceSpam = !spaceSpam;
-                std::cout << "dialoge skip is " << (spaceSpam ? "on hold \"R\" to use" : "off") <<  std::endl;
+                std::cout << "dialoge skip is " << (spaceSpam ? "on hold \"R\" or LCLICK to use" : "off") <<  std::endl;
                 Sleep(500);
             }
 
-            if (spaceSpam && GetAsyncKeyState(0x52) & 0x8000)
+            if (spaceSpam && GetAsyncKeyState(0x52) & 0x8000|| spaceSpam && GetAsyncKeyState(VK_RBUTTON) & 0x8000)
             {
                 if (gamespeedBool) {
                     gamespeedBool = false;
@@ -279,11 +312,17 @@ void MainRoutine() {
                     // std::cout << "debugginfo: Value at offset = " << std::hex << pointsAddress << std::endl;
                 }
                 pointsAddress += pointsOffsets.at(pointsOffsets.size() - 1);
-            
+
+                int value1 = Read<int>(LPVOID(pointsAddress));
+                if (value1 == 2) {
+                    Write<int>(LPVOID(pointsAddress), 50);
+                }
+                
+
 
             if (GetAsyncKeyState(VK_F2) & 0x8000) {
                
-                float battlespeed = 10.f;//Add Last offset -> done!!
+                float battlespeed = 100.f;//Add Last offset -> done!!
                 WriteProcessMemory(hProcess, (LPVOID)(pointsAddress), &battlespeed, 8, 0);
 
                 //write(BattleSpeedAddress, 12.f);
@@ -332,7 +371,7 @@ void MainRoutine() {
 
                 }}
 
-
+            DWORD procId = GetProcId(L"StarRail.exe");
             if (procId == 0) {
                 std::cout << "Star Rail has been closed" << std::endl;
                 exit(0);
@@ -343,7 +382,7 @@ void MainRoutine() {
     }
 }
 int main(){
-    SetConsoleTitle(L"STAR RAIL FPS UNLOCKER BY ELJoOker#8401");
+    SetConsoleTitle(L"STAR RAIL MENU BY ELJoOker#8401");
 
     std::string files[] = { "kdu.exe", "Driver.sys", "drv64.dll" , "DLL.dll"};
     bool kdu_files_exist = true;
@@ -379,25 +418,7 @@ int main(){
         const wchar_t* processName = L"StarRail.exe";
         // Wait for the process to start
         if (!IsProcessRunning(processName)) {
-            std::string files[] = { "dll_injector64.exe", "star_rail.dll" };
-            bool bypass_files_exist = true;
-
-            for (const auto& file_name : files) {
-                std::ifstream file(file_name);
-                if (!file.good()) {
-                    bypass_files_exist = false;
-                    std::cerr << "Error: '" << file_name << "' not found" << std::endl;
-                }
-            }
-            if (bypass_files_exist) {
-                // all files exist, execute the command
-                system("dll_injector64.exe /dll star_rail.dll /target StarRail.exe");
-                std::cout << "successfully excuted all commands\n";
-                Sleep(500);
-            }
-            else {
-                std::cout << "unknown error\n";
-            }
+            //dllInjection();
             // Get the current directory
             char currentDirectory[MAX_PATH];
             GetModuleFileNameA(NULL, currentDirectory, MAX_PATH);
@@ -408,37 +429,37 @@ int main(){
             // Process ID of the target process to attach to
            // Name of the process to wait for
 
-             /*   // Specify the name of the executable to run
-                std::string exeName = "StarRail.exe";
+                // Specify the name of the executable to run
+            std::string exeName = "StarRail.exe";
 
-                // Build the full path to the executable
-                std::string exePath = path + exeName;
+            // Build the full path to the executable
+            std::string exePath = path + exeName;
 
-                // Start the process
-                STARTUPINFOA si;
-                PROCESS_INFORMATION pi;
-                ZeroMemory(&si, sizeof(si));
-                si.cb = sizeof(si);
-                ZeroMemory(&pi, sizeof(pi));
-
-                if (CreateProcessA(NULL, const_cast<char*>(exePath.c_str()), NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi))
-                {
-                    std::cout << "Process started successfully.\n";
-                    // Optionally, you can wait for the process to finish using WaitForSingleObject
-                    //WaitForSingleObject(pi.hProcess, INFINITE);
-                    CloseHandle(pi.hProcess);
-                    CloseHandle(pi.hThread);
-                }
-                else
-                {
-                    std::cerr << "Failed to start process. Error code: " << GetLastError() << "\n";
-                    return 1;
-                }
-
+            // Start the process
+            STARTUPINFOA si;
+            PROCESS_INFORMATION pi;
+            ZeroMemory(&si, sizeof(si));
+            si.cb = sizeof(si);
+            ZeroMemory(&pi, sizeof(pi));
+        
+            if (CreateProcessA(NULL, const_cast<char*>(exePath.c_str()), NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi))
+            {
+                std::cout << "Process started successfully.\n";
+                // Optionally, you can wait for the process to finish using WaitForSingleObject
+                //WaitForSingleObject(pi.hProcess, INFINITE);
+                CloseHandle(pi.hProcess);
+                CloseHandle(pi.hThread);
             }
-            */
-            MainRoutine();
+            else
+            {
+                std::cerr << "Failed to start process. Error code: " << GetLastError() << "\n";
+                return 1;
+            }
 
+        
+
+            MainRoutine();
+        
         }
         else
         {
