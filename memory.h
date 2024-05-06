@@ -92,28 +92,4 @@ K read(uintptr_t address) {
     return *reinterpret_cast<K*>(address);
 }
 
-bool TerminateProcessByName(const wchar_t* processName) {
-    PROCESSENTRY32 entry;
-    entry.dwSize = sizeof(PROCESSENTRY32);
-
-    HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-
-    if (Process32First(snapshot, &entry)) {
-        do {
-            if (_wcsicmp(entry.szExeFile, processName) == 0) {
-                HANDLE processHandle = OpenProcess(PROCESS_TERMINATE, FALSE, entry.th32ProcessID);
-                if (processHandle) {
-                    TerminateProcess(processHandle, 0);
-                    CloseHandle(processHandle);
-                    CloseHandle(snapshot);
-                    return true;
-                }
-            }
-        } while (Process32Next(snapshot, &entry));
-    }
-
-    CloseHandle(snapshot);
-    return false;
-}
-
 #endif
